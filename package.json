@@ -8,8 +8,8 @@
   "scripts": {
     "dev": "cd src && next dev",
     "build": "cd src && next build",
-    "start": "next start",
-    "lint": "eslint",
+    "start": "cd src && next start",
+    "lint": "eslint src/app src/integration_test",
     "test": "vitest run --config vitest.config.mts",
     "test:integration": "vitest run --config vitest.config.mts",
     "test:watch": "vitest --config vitest.config.mts"
