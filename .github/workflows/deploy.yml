@@ -21,6 +21,15 @@ jobs:
       - name: Install Vercel CLI
         run: npm install -g vercel
 
+      - name: Get current production deployment (for rollback)
+        id: current
+        run: |
+          CURRENT=$(vercel ls --prod --token=${{ secrets.VERCEL_TOKEN }} | grep "● " | head -1 | awk '{print $2}')
+          echo "url=$CURRENT" >> $GITHUB_OUTPUT
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
       - name: Deploy to Vercel (production)
         id: deploy
         run: vercel --prod --token=${{ secrets.VERCEL_TOKEN }}
@@ -29,8 +38,8 @@ jobs:
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
       - name: Rollback on deployment failure
-        if: failure() && steps.deploy.outcome == 'failure'
-        run: vercel rollback --token=${{ secrets.VERCEL_TOKEN }}
+        if: failure() && steps.deploy.outcome == 'failure' && steps.current.outputs.url != ''
+        run: vercel rollback ${{ steps.current.outputs.url }} --token=${{ secrets.VERCEL_TOKEN }}
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
