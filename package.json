@@ -12,7 +12,8 @@
     "lint": "eslint src/app src/integration_test",
     "test": "vitest run --config vitest.config.mts",
     "test:integration": "vitest run --config vitest.config.mts",
-    "test:watch": "vitest --config vitest.config.mts"
+    "test:watch": "vitest --config vitest.config.mts",
+    "typecheck": "tsc --noEmit -p src/tsconfig.json"
   },
   "dependencies": {
     "next": "16.2.1",
