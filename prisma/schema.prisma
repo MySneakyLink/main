@@ -22,6 +22,10 @@ model User {
   Level Int @default(0)
   record Record?
   preference Preference?
+  trophies UserTrophies[]
+  following Friends[] @relation("Following")
+  follower Friends[] @relation("Follower")
+
 }
 
 model Record {
@@ -67,6 +71,35 @@ model Preference {
   PrefTime TimeSlots[] @default([])
   user User @relation(fields: [UserPref], references: [UserID])
   UserPref String @unique
+}
+
+
+model UserTrophies {
+  UserTrophID String @id @default(uuid())
+  user User @relation(fields: [UserTroph], references: [UserID])
+  UserTroph String 
+  trophies Trophies @relation(fields: [troph],references: [TrophieID])
+  troph String 
+  earnedDate DateTime @default(now())
+  @@unique([UserTroph, troph])
+}
+
+model Trophies {
+  TrophieID String @id @default(uuid())
+  TrophieAssign UserTrophies[]
+  TrophieName String @unique
+  XPRequired Int 
+  ImageUrl String
+}
+
+model Friends {
+  FriendID String @id @default(uuid())
+  Following User @relation("Following",fields: [FollowingID], references: [UserID])
+  FollowingID String @unique
+  Follower User @relation("Follower",fields: [FollowerID], references: [UserID])
+  FollowerID String @unique
+  friendsCreated DateTime @default(now())
+  @@unique([FollowingID, FollowerID])
 }
 
 
