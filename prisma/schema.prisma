@@ -12,32 +12,6 @@ datasource db {
 }
 
 
-model User {
-  UserID    String    @id @default(uuid()) 
-  FName String 
-  LName String
-  Email String @unique
-  College String?
-  xp Int @default(0)
-  Level Int @default(0)
-  record Record?
-  preference Preference?
-  trophies UserTrophies[]
-  following Friends[] @relation("Following")
-  follower Friends[] @relation("Follower")
-
-}
-
-model Record {
-  RecID String @id @default(uuid())
-  DailyQuestCompleted Int @default(0)
-  DailyQuestAssign Int @default(0)
-  QuestsCompleted Int @default(0)
-  BossQuestCompleted Int @default(0)
-  user User @relation(fields: [UserRec], references: [UserID])
-  UserRec String @unique
-}
-
 enum Days {
 Monday
 Teusday
@@ -62,6 +36,66 @@ EarlyEvening
 LateEvening
 }
 
+enum Notification {
+Text
+Email
+Push
+}
+
+enum DifficultyScale { /// For now, change it to something more fun.
+easy
+medium
+hard
+}
+
+enum QuestType {
+Daily
+Normal
+}
+
+enum Months {
+JANUARY
+FEBRUARY
+MARCH
+APRIL
+MAY
+JUNE
+JULY
+AUGUST
+SEPTEMBER
+OCTOBER
+NOVEMBER
+DECEMBER
+}
+
+model User {
+  UserID    String    @id @default(uuid()) 
+  FName String 
+  LName String
+  Email String @unique
+  College String?
+  xp Int @default(0)
+  Level Int @default(0)
+  record Records?
+  preference Preference?
+  trophies UserTrophies[]
+  following Friends[] @relation("Following")
+  follower Friends[] @relation("Follower")
+  setting Settings?
+  quests UserQuestAssign[]
+}
+
+model Records {
+  RecID String @id @default(uuid())
+  DailyQuestCompleted Int @default(0)
+  DailyQuestAssign Int @default(0)
+  QuestsCompleted Int @default(0)
+  BossQuestCompleted Int @default(0)
+  UserRec User @relation(fields: [UserRecID], references: [UserID])
+  UserRecID String @unique
+}
+
+
 model Preference {
   PrefID String @id @default(uuid())
   PrefDay Days[] @default([])
@@ -69,40 +103,70 @@ model Preference {
   DistanceCommute Int?
   Location String?
   PrefTime TimeSlots[] @default([])
-  user User @relation(fields: [UserPref], references: [UserID])
-  UserPref String @unique
+  UserPref User @relation(fields: [UserPrefID], references: [UserID])
+  UserPrefID String @unique
 }
 
 
 model UserTrophies {
-  UserTrophID String @id @default(uuid())
-  user User @relation(fields: [UserTroph], references: [UserID])
-  UserTroph String 
-  trophies Trophies @relation(fields: [troph],references: [TrophieID])
-  troph String 
+  UserTrophiesID String @id @default(uuid())
   earnedDate DateTime @default(now())
-  @@unique([UserTroph, troph])
+  UserTroph User @relation(fields: [UserTrophID], references: [UserID])
+  UserTrophID String 
+  trophies Trophies @relation(fields: [trophiesID],references: [TrophieID])
+  trophiesID String 
+  @@unique([UserTrophID, trophiesID])
 }
 
 model Trophies {
   TrophieID String @id @default(uuid())
-  TrophieAssign UserTrophies[]
   TrophieName String @unique
   XPRequired Int 
   ImageUrl String
+  TrophieAssign UserTrophies[]
 }
 
 model Friends {
   FriendID String @id @default(uuid())
+  FriendsCreated DateTime @default(now())
   Following User @relation("Following",fields: [FollowingID], references: [UserID])
-  FollowingID String @unique
+  FollowingID String 
   Follower User @relation("Follower",fields: [FollowerID], references: [UserID])
-  FollowerID String @unique
-  friendsCreated DateTime @default(now())
+  FollowerID String 
   @@unique([FollowingID, FollowerID])
 }
 
+model Settings {
+  SettingsID String @id @default(uuid())
+  UserSetting User @relation(fields: [UserSettingID], references: [UserID])
+  UserSettingID String @unique
+}
 
+model UserQuestAssign {
+  UserQuestAssignID String @id @default(uuid())
+  AssignedDate DateTime @default(now())
+  Completed Boolean @default(false)
+  CompletedTime DateTime?
+  UserQuest User @relation(fields: [UserQuestID], references: [UserID])
+  UserQuestID String 
+  QuestUser Quests @relation(fields: [QuestUserID],references: [QuestID])
+  QuestUserID String 
+}
+
+
+model Quests {
+  QuestID String @id @default(uuid())
+  Name String
+  EstTime Int?
+  XP Int
+  Desc String
+  Diff DifficultyScale
+  Weight Int
+  Type QuestType
+  StartMonth Months
+  EndMonth Months
+  QuestAssign UserQuestAssign[]
+}
 
 
 
