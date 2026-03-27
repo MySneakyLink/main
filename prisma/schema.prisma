@@ -21,6 +21,7 @@ model User {
   xp Int @default(0)
   Level Int @default(0)
   record Record?
+  preference Preference?
 }
 
 model Record {
@@ -32,5 +33,43 @@ model Record {
   user User @relation(fields: [UserRec], references: [UserID])
   UserRec String @unique
 }
+
+enum Days {
+Monday
+Teusday
+Wednesday
+Thursday
+Friday
+Saturday
+Sunday
+}
+
+enum Worktype {
+Environmental
+Food
+Homeless
+}
+
+enum TimeSlots {
+EarlyMorning
+LateMorning
+Afternoon
+EarlyEvening
+LateEvening
+}
+
+model Preference {
+  PrefID String @id @default(uuid())
+  PrefDay Days[] @default([])
+  WorkType Worktype[] @default([])
+  DistanceCommute Int?
+  Location String?
+  PrefTime TimeSlots[] @default([])
+  user User @relation(fields: [UserPref], references: [UserID])
+  UserPref String @unique
+}
+
+
+
 
 
