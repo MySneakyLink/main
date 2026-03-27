@@ -83,6 +83,8 @@ model User {
   follower Friends[] @relation("Follower")
   setting Settings?
   quests UserQuestAssign[]
+  rbquests RBUserQuestAssign[]
+
 }
 
 model Records {
@@ -168,5 +170,32 @@ model Quests {
   QuestAssign UserQuestAssign[]
 }
 
+model RBUserQuestAssign {
+  UserQuestAssignID String @id @default(uuid())
+  RSVP DateTime @default(now())
+  Attended Boolean @default(false)
+  AttendedTime DateTime?
+  RBUserQuest User @relation(fields: [RBUserQuestID], references: [UserID])
+  RBUserQuestID String 
+  RBQuestUser RBQuests @relation(fields: [RBQuestUserID],references: [RBQuestID])
+  RBQuestUserID String 
+}
 
+
+model RBQuests {
+  RBQuestID String @id @default(uuid())
+  Name String
+  EstTime Int?
+  XP Int
+  Desc String
+  Weight Int
+  Start DateTime
+  RBQuestAssign RBUserQuestAssign[]
+}
+
+model RBOrg {
+  RBOrgID String @id @default(uuid())
+  Name String
+  Desc String
+}
 
