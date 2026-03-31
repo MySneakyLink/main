@@ -69,7 +69,7 @@ async function main() {
       },
     ],
   });
-  console.log('seeding completed');
+  console.log("seeding completed");
 }
 main()
   .then(async () => {
