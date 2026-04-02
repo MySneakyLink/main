@@ -16,8 +16,13 @@ async function main() {
   const JsonExample: string = JSON.stringify(exampledata);
   // console.log(JsonExample)
 
-  const QuestSchema = z.object({
-    New: z.boolean(),
+  const MatchSchema = z.object({
+  New: z.literal(false),
+  MatchedName: z.string(),
+});
+
+  const NewQuestSchema = z.object({
+    New: z.literal(true),
     Name: z.string(),
     EstTime: z.number(),
     XP: z.number(),
@@ -30,24 +35,35 @@ async function main() {
     EndMonth: z.string(),
   });
 
+  const QuestSchema = z.discriminatedUnion("New", [MatchSchema,NewQuestSchema])
+
   const reportText1 = "The charles river is way too dirty";
   const reportText2 = "There's a ton of trash and broken bottles piling up at Riverside Park. The benches and walkways are covered in litter. Someone needs to go clean it up.";
   const GemeniConfig = {
     systemInstruction: `Here are the existing quests: ${JsonData} 
     Based on the report given in the prompt,
     Determine if this matches an existing quest or needs a new one. 
-    If it matches, the New part of the response/Json should be False and everything else can be null
+    If it matches, follow the zod schema and return me just the match and ID of that 
     If it doesn't match you need to create a new quest for it, 
     The format of the new quest should match the the json format in the ${JsonExample} 
     with some example quests given to guide you in making a new quest,
+    "You MUST include a New field in your response. If the report matches an existing quest, 
+    set New: false and MatchedName to the quest name. If it's a new quest, set New: true and fill in all fields."
     `,
     responseMimeType: "application/json",
     responseJsonSchema: zodToJsonSchema(QuestSchema),
   };
 
   const Response = await Gemeni(reportText1, "gemini-2.5-flash", GemeniConfig);
+  console.log(Response.text)
   const quest = QuestSchema.parse(JSON.parse(Response.text));
-  console.log(quest);
+  // console.log(quest);
+
+  if (quest.New === true) {
+    delete quest.New
+    console.log(quest)
+    const NewQuest = await prisma.quests.create({data:quest})
+  }
 //   interface Quest {
 //     Name: string;
 //     EstTime: number;
