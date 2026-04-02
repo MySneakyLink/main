@@ -247,7 +247,7 @@ model UserQuestAssign {
 
 model Quests {
   QuestID String @id @default(uuid())
-  Name String
+  Name String @unique
   EstTime Int?
   XP Int
   Desc String

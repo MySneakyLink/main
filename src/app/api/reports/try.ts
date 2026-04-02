@@ -2,7 +2,6 @@ import "dotenv/config";
 import { Gemeni } from "../../../lib/gemeni";
 import prisma from "../../..//lib/prisma";
 import { z } from "zod";
-import { zodToJsonSchema } from "zod-to-json-schema";
 
 async function main() {
   const data = await prisma.quests.findMany({
@@ -17,9 +16,9 @@ async function main() {
   // console.log(JsonExample)
 
   const MatchSchema = z.object({
-  New: z.literal(false),
-  MatchedName: z.string(),
-});
+    New: z.literal(false),
+    MatchedName: z.string(),
+  });
 
   const NewQuestSchema = z.object({
     New: z.literal(true),
@@ -29,16 +28,20 @@ async function main() {
     Desc: z.string(),
     Weight: z.number(),
     Blurb: z.string(),
-    Diff: z.string(),
-    Type: z.string(),
-    StartMonth: z.string(),
-    EndMonth: z.string(),
+    Diff: z.enum(["easy", "medium", "hard"]),
+    Type: z.enum(["Daily", "Normal"]),
+    StartMonth: z.enum(["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"]),
+    EndMonth: z.enum(["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"]),
   });
 
-  const QuestSchema = z.discriminatedUnion("New", [MatchSchema,NewQuestSchema])
+  const QuestSchema = z.discriminatedUnion("New", [
+    MatchSchema,
+    NewQuestSchema,
+  ]);
 
-  const reportText1 = "The charles river is way too dirty";
-  const reportText2 = "There's a ton of trash and broken bottles piling up at Riverside Park. The benches and walkways are covered in litter. Someone needs to go clean it up.";
+  const reportText1 = "291 saint botolph street is way too dirty like what to do ong, there is black garbage bags everywhere. ";
+  const reportText2 =
+    "There's a ton of trash and broken bottles piling up at Riverside Park. The benches and walkways are covered in litter. Someone needs to go clean it up.";
   const GemeniConfig = {
     systemInstruction: `Here are the existing quests: ${JsonData} 
     Based on the report given in the prompt,
@@ -51,34 +54,23 @@ async function main() {
     set New: false and MatchedName to the quest name. If it's a new quest, set New: true and fill in all fields."
     `,
     responseMimeType: "application/json",
-    responseJsonSchema: zodToJsonSchema(QuestSchema),
   };
 
   const Response = await Gemeni(reportText1, "gemini-2.5-flash", GemeniConfig);
-  console.log(Response.text)
+  console.log(Response.text);
   const quest = QuestSchema.parse(JSON.parse(Response.text));
   // console.log(quest);
 
   if (quest.New === true) {
-    delete quest.New
-    console.log(quest)
-    const NewQuest = await prisma.quests.create({data:quest})
+    delete quest.New;
+    console.log(quest);
+    const NewQuest = await prisma.quests.create({ data: quest });
+  } else {
+    const NewQuest = await prisma.quests.update({
+      where: { Name: quest.MatchedName },
+      data: { Weight: { increment: 2 } },
+    });
   }
-//   interface Quest {
-//     Name: string;
-//     EstTime: number;
-//     XP: number;
-//     Desc: string;
-//     Weight: number;
-//     Blurb: string;
-//     Diff: string;
-//     Type: string;
-//     StartMonth: string;
-//     EndMonth: string;
-//   }
-// }
-// const NewQuest = JSON.parse(Response) as Quest;
-
 }
 
 main();
