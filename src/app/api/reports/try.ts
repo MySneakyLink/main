@@ -4,16 +4,21 @@ import prisma from "../../..//lib/prisma";
 import { z } from "zod";
 
 async function main() {
-  const data = await prisma.quests.findMany({
-    select: { Name: true, Blurb: true },
-  });
+  // const data = await prisma.quests.findMany({
+  //   select: { Name: true, Blurb: true },
+  // });
 
-  const exampledata = await prisma.quests.findMany({
-    take: 3,
-  });
-  const JsonData: string = JSON.stringify(data);
-  const JsonExample: string = JSON.stringify(exampledata);
+  // const exampledata = await prisma.quests.findMany({
+  //   take: 3,
+  // });
+  // const JsonData: string = JSON.stringify(data);
+  // const JsonExample: string = JSON.stringify(exampledata);
   // console.log(JsonExample)
+
+  const AllData = await prisma.quests.findMany()
+  const ExampleData = AllData.slice(2)
+  // const ActualData = AllData
+  
 
   const MatchSchema = z.object({
     New: z.literal(false),
@@ -39,7 +44,7 @@ async function main() {
     NewQuestSchema,
   ]);
 
-  const reportText1 = "291 saint botolph street is way too dirty like what to do ong, there is black garbage bags everywhere. ";
+  const reportText1 = "Northeastern university dining hall has a lot of foodwaste, lets redistribute it";
   const reportText2 =
     "There's a ton of trash and broken bottles piling up at Riverside Park. The benches and walkways are covered in litter. Someone needs to go clean it up.";
   const GemeniConfig = {
@@ -57,6 +62,7 @@ async function main() {
   };
 
   const Response = await Gemeni(reportText1, "gemini-2.5-flash", GemeniConfig);
+
   console.log(Response.text);
   const quest = QuestSchema.parse(JSON.parse(Response.text));
   // console.log(quest);

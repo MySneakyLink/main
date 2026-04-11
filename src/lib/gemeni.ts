@@ -32,7 +32,7 @@ const ai = process.env.GEMINI_API_KEY
 
 async function Gemeni(
   prompt: string,
-  model: string = "gemini-3-flash-preview",
+  model: string = "gemini-2.5-flash",
   config: object = {
     temperature: 0.2,
     responseMimeType: "application/json",
