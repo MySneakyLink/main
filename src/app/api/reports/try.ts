@@ -11,14 +11,12 @@ async function main() {
   // const exampledata = await prisma.quests.findMany({
   //   take: 3,
   // });
-  // const JsonData: string = JSON.stringify(data);
-  // const JsonExample: string = JSON.stringify(exampledata);
-  // console.log(JsonExample)
 
-  const AllData = await prisma.quests.findMany()
-  const ExampleData = AllData.slice(2)
-  // const ActualData = AllData
-  
+  const AllData = await prisma.quests.findMany();
+  const data = AllData.map((q) => ({ Name: q.Name, Blurb: q.Blurb }));
+  const ExampleData = AllData.slice(2);
+  const JsonData: string = JSON.stringify(data);
+  const JsonExample: string = JSON.stringify(ExampleData);
 
   const MatchSchema = z.object({
     New: z.literal(false),
@@ -35,8 +33,34 @@ async function main() {
     Blurb: z.string(),
     Diff: z.enum(["easy", "medium", "hard"]),
     Type: z.enum(["Daily", "Normal"]),
-    StartMonth: z.enum(["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"]),
-    EndMonth: z.enum(["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"]),
+    StartMonth: z.enum([
+      "JANUARY",
+      "FEBRUARY",
+      "MARCH",
+      "APRIL",
+      "MAY",
+      "JUNE",
+      "JULY",
+      "AUGUST",
+      "SEPTEMBER",
+      "OCTOBER",
+      "NOVEMBER",
+      "DECEMBER",
+    ]),
+    EndMonth: z.enum([
+      "JANUARY",
+      "FEBRUARY",
+      "MARCH",
+      "APRIL",
+      "MAY",
+      "JUNE",
+      "JULY",
+      "AUGUST",
+      "SEPTEMBER",
+      "OCTOBER",
+      "NOVEMBER",
+      "DECEMBER",
+    ]),
   });
 
   const QuestSchema = z.discriminatedUnion("New", [
@@ -44,7 +68,8 @@ async function main() {
     NewQuestSchema,
   ]);
 
-  const reportText1 = "Northeastern university dining hall has a lot of foodwaste, lets redistribute it";
+  const reportText1 =
+    "Northeastern university dining hall has a lot of foodwaste, lets redistribute it";
   const reportText2 =
     "There's a ton of trash and broken bottles piling up at Riverside Park. The benches and walkways are covered in litter. Someone needs to go clean it up.";
   const GemeniConfig = {
@@ -61,11 +86,11 @@ async function main() {
     responseMimeType: "application/json",
   };
 
-  const Response = await Gemeni(reportText1, "gemini-2.5-flash", GemeniConfig);
+  const Response = await Gemeni(reportText1, "gemini-2.5-flash-lite", GemeniConfig);
 
   console.log(Response.text);
   const quest = QuestSchema.parse(JSON.parse(Response.text));
-  // console.log(quest);
+  console.log(typeof quest);
 
   if (quest.New === true) {
     delete quest.New;
