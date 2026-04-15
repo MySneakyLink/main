@@ -23,7 +23,7 @@ import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { Gemeni } from "@/lib/gemeni";
 import { z } from "zod";
-import {questSchemaObject} from "../../../../types/questSchema"
+import { questSchemaObject } from "../../../../types/questSchema";
 import { questPrompt } from "./prompt";
 
 /**
@@ -56,7 +56,10 @@ type Quest = z.infer<typeof QuestSchema>;
  */
 async function getQuestData() {
   const allQuestData = await prisma.quests.findMany();
-  const questNameBlurb = allQuestData.map((q) => ({ Name: q.Name, Blurb: q.Blurb }));
+  const questNameBlurb = allQuestData.map((q) => ({
+    Name: q.Name,
+    Blurb: q.Blurb,
+  }));
   const jsonQuestNameBlurb: string = JSON.stringify(questNameBlurb);
   const jsonFirstThreeQuest: string = JSON.stringify(allQuestData.slice(2));
   return { jsonQuestNameBlurb, jsonFirstThreeQuest };
@@ -78,13 +81,21 @@ async function getQuestData() {
  * The response is validated against QuestSchema (discriminated union) to ensure
  * type safety before passing to updateSupa()
  */
-async function gemeniNewQuest(newQuest: string, questNameBlurb: string, firstThreeQuest: string) {
+async function gemeniNewQuest(
+  newQuest: string,
+  questNameBlurb: string,
+  firstThreeQuest: string,
+) {
   const gemeniConfig = {
     systemInstruction: questPrompt(questNameBlurb, firstThreeQuest),
     responseMimeType: "application/json",
   };
 
-  const gemeniNewQuestResponse = await Gemeni(newQuest, "gemini-2.5-flash", gemeniConfig);
+  const gemeniNewQuestResponse = await Gemeni(
+    newQuest,
+    "gemini-2.5-flash",
+    gemeniConfig,
+  );
 
   return QuestSchema.parse(JSON.parse(gemeniNewQuestResponse.text));
 }
@@ -116,7 +127,11 @@ export const POST = async (req: Request) => {
   try {
     const { jsonQuestNameBlurb, jsonFirstThreeQuest } = await getQuestData();
     const { reportText } = await req.json();
-    const newQuestResult = await gemeniNewQuest(reportText, jsonQuestNameBlurb, jsonFirstThreeQuest);
+    const newQuestResult = await gemeniNewQuest(
+      reportText,
+      jsonQuestNameBlurb,
+      jsonFirstThreeQuest,
+    );
     await updateSupa(newQuestResult);
 
     return NextResponse.json(
@@ -126,9 +141,12 @@ export const POST = async (req: Request) => {
       { status: 200 },
     );
   } catch (error) {
-    return NextResponse.json({
-      msg: "Failed to process report",
-      error: error.message,
-    });
+    return NextResponse.json(
+      {
+        msg: "Failed to process report",
+        error: error.message,
+      },
+      { status: 500 },
+    );
   }
 };
