@@ -1,3 +1,11 @@
+// A file which host future LLM prompts
+/**
+ * Builds the LLM prompt used to match a report to an existing quest or define a new one.
+ *
+ * @param questNameBlurb Serialized summary of existing quests available for matching.
+ * @param firstThreeQuest Example quest JSON used as a template when creating a new quest.
+ * @returns Prompt text to send to the model.
+ */
 function questPrompt (questNameBlurb : string, firstThreeQuest: string) : string {
     const returnString =`Here are the existing quests: ${questNameBlurb}
     Based on the report given in the prompt,
@@ -11,5 +19,4 @@ function questPrompt (questNameBlurb : string, firstThreeQuest: string) : string
     `
     return returnString  
 }
-
 export {questPrompt}

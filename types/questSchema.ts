@@ -1,5 +1,18 @@
+/**
+ * Defines the shared Zod shape used to validate newly generated quest payloads.
+ */
 import {z} from "zod"
 
+/**
+ * Base Zod shape for a newly generated quest.
+ *
+ * Fields:
+ * - `New`: Marks the payload as a brand-new quest instead of a match.
+ * - `Name`, `Desc`, `Blurb`: User-facing quest copy.
+ * - `EstTime`, `XP`, `Weight`: Numeric gameplay and ranking values.
+ * - `Diff`, `Type`: Quest difficulty and cadence enums.
+ * - `StartMonth`, `EndMonth`: Seasonal availability window.
+ */
 const questSchemaObject = {
   New: z.literal(true),
   Name: z.string(),
