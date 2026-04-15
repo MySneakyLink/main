@@ -56,6 +56,7 @@ async function main() {
     Blurb: z.string(),
     Diff: z.enum(["easy", "medium", "hard"]),
     Type: z.enum(["Daily", "Normal"]),
+    Capacity: z.number(),
     StartMonth: z.enum([
       "JANUARY",
       "FEBRUARY",

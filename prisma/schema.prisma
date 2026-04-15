@@ -253,6 +253,7 @@ model Quests {
   Desc String
   Weight Int
   Blurb String
+  Capacity Int
   Diff DifficultyScale
   Type QuestType
   StartMonth Months
@@ -281,6 +282,7 @@ model RBQuests {
   Desc String
   Weight Int
   Start DateTime
+  Capacity Int
   RBQuestOrg RBOrg @relation(fields: [RBQuestOrgID],references: [RBOrgID])
   RBQuestOrgID String 
   RBQuestAssign RBUserQuestAssign[]

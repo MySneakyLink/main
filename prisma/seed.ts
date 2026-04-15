@@ -23,6 +23,7 @@ async function main() {
     Type: "Normal",
     StartMonth: "MARCH",
     EndMonth: "NOVEMBER",
+    Capacity: 20
   },
   {
     Name: "Community Food Drive",
@@ -35,6 +36,7 @@ async function main() {
     Type: "Normal",
     StartMonth: "JANUARY",
     EndMonth: "DECEMBER",
+    Capacity: 30
   },
   {
     Name: "Street Pothole Reporting",
@@ -47,6 +49,7 @@ async function main() {
     Type: "Daily",
     StartMonth: "JANUARY",
     EndMonth: "DECEMBER",
+    Capacity: 5
   },
   {
     Name: "Homeless Care Kit Assembly",
@@ -59,6 +62,7 @@ async function main() {
     Type: "Normal",
     StartMonth: "JANUARY",
     EndMonth: "DECEMBER",
+    Capacity: 9
   },
   {
     Name: "Storm Drain Cleanup",
@@ -71,6 +75,7 @@ async function main() {
     Type: "Normal",
     StartMonth: "APRIL",
     EndMonth: "OCTOBER",
+    Capacity: 19
   },
 ],
   });
